@@ -1,0 +1,74 @@
+import numpy as np 
+import pandas as pd 
+import matplotlib.pyplot as plt  
+%matplotlib inline
+college_data = pd.read_csv("/Users/jesusluna/Downloads/college.csv")
+college_data
+college_data['Private_or_public_bool_'] = (college_data['Private'] == 'Yes') + 0
+college_data.drop('Private',axis=1).head()
+#I made a new column in the dataframe to change the values of wether the schools were public or private into numerical values. 1 being private and 0 being public.
+# Statistical Ananlysis 
+I sort the data to organize the schools by graduation rate from top ( schools with highest graduation rates) to bottom ( schools with the lowest graduation rates
+graduate_rate = college_data.sort_values(["Grad.Rate"], ascending= False)
+print(graduate_rate)
+# top 5 school with the highest graduation rate 
+top_graduate_rate = graduate_rate.head(5)
+top_graduate_rate
+# schools with the lowest graduation rate 
+bottom_graduate_rate = graduate_rate.tail(5)
+bottom_graduate_rate
+From what I have seen from the the top school with the highest graduation rates is that mainly those schools with highest  Percentage of. new students from top 10% & 25% of H.S. class. another observation that I have seen from this raw data is that the schools with the lowest graduation rate have a high percentage of partime undergraduate students. 
+college_data.hist(column='Grad.Rate')
+ax1 = college_data.plot.scatter(x = 'Grad.Rate',
+                         y = 'Unnamed: 0')
+college_data.describe()
+top5_college = top_graduate_rate.drop(columns=['Room.Board','Books','Apps','Outstate','Personal','Terminal','Expend'])
+axt = top5_college.groupby('Unnamed: 0').mean().plot(kind='bar')  
+ax.set_xlabel('Colleges', fontsize=12)
+plt.show()
+bottom5_college = bottom_graduate_rate.drop(columns=['Room.Board','Books','Apps','Outstate','Personal','Terminal','Expend'])
+axb = bottom5_college.groupby('Unnamed: 0').mean().plot(kind='bar')  
+ax.set_xlabel('Colleges', fontsize=12)
+plt.show()
+#We can see in this bar graph from the bottom 5 schools how outstanding are the brown bars representing the amount of part time undergraduates in comparason with the top 5 schools with the higest graduation rates.We can oberserve that Texas Souther University, which is the school with the lowest graduation rate has a high amount of part time undergraduates. 
+ax1 = college_data.plot.scatter(x = 'Grad.Rate',
+                               y = 'Top10perc')
+ax2 = college_data.plot.scatter(x = 'Grad.Rate',
+                               y = 'Top25perc')
+ax3 = college_data.plot.scatter(x = 'Grad.Rate',
+                               y = 'F.Undergrad')
+ax4 = college_data.plot.scatter(x = 'Grad.Rate',
+                               y = 'P.Undergrad')
+ax5 = college_data.plot.scatter(x = 'Grad.Rate',
+                               y = 'Enroll')
+    # After seing many of independent varibales graphs with the dependent variaables I can see that there is some correlation between them and the graduation rate. At the same time it is not a big enough correlation or factor taht determines a huge play role in graduation rate. Based on my intution is that there might be some bias, such as the size of the school, which is not included in the dataset. One that does seem to play a huge factor on graduation rate based in the analysis of the graph is the  new students from top 25% of H.S class. 
+    # 3. statistical Inference 
+    ## The variables that I am interested to test to determine wether they play a role in a school Graduation rate are, the number of full time & part time students, the student that were part of their top 10%  top 25% in high school and the number of students that are enroll.
+
+my null hypothesis is that the coefficients of P.Undergrad,F.Undergrad,Top25perc,Top10perc,Enrol are all 0. 
+
+as for my alternative hypothesis is that the coefficients of P.Undergrad,F.Undergrad,Top25perc,Top10perc,Enroll are not 0. 
+col_list = ['P.Undergrad','F.Undergrad','Top25perc','Top10perc','Enroll']
+x = college_data[col_list]
+y = college_data['Grad.Rate']
+import statsmodels.api as sm
+
+x=sm.add_constant(x) 
+x
+# running regression OLS
+est = sm.OLS(y, x)
+est2 = est.fit() # gives us estimators for b0, b1, etc.
+print(est2.summary()) # printing out summary of our OLS
+#  $$ Grad.Rate = 48.67 - 0.01P.Undergrad - 0.01F.Undergrad + 0.21Top25perc+0.24Top10perc + 0.01Enroll $$
+# 4. Conclusion 
+
+I will be working with a significance level of 0.05 in order to evaluate my results. 
+
+Since our P-value were all less than 0.05 we can reject out null hypothesis. this means that we have statistacally enough evidence to believa that erollmment, Percentage of. new students from top 10% & 25% of H.S. class, amount of full time and part time undergraduates have a strong correlation and play a factor with the percentage of graduation rate in Colleges and Universities across the U.S. 
+
+this being said when the population of part-time undergrade goes up by 1 Graduation rate decrease by about 0.01, same goes with population of full-time undergrad students. As for the percentage of new students from the top 10% of high school class increases by 1 Graduation rate increases by about 0.21, as for top 25% of high school class increases by 1 Graduation rate increases by about 0.24. Lastly if enrollment increases by 1 graduation rate increases by 0.01.
+
+From this dataset I can conclude that gradution rate is hugely affected by the student body that were in the top percentages of their high school classes. I was surprised that the population of part time students did not play a huge role in gradution rates since by only looking at the graph it seemed that this was going to be one of the varibles that determine the graduation rate. Thought, there a lot of more factors that determine graduation rate that were not included in this dataset, such as the size of the school it gave me a clear idea on what determine graduation rate across Colleges in America. This dataset open my eyes on how high school education is important in order for people in order to complete their bachelor's deegree. 
+
+This was a fun project to do and it will help me in my career after I graduate college, since it enhance my abilities to analyze, organize and understand complex data. 
+
